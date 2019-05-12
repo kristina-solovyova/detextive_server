@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User, Group
-from rest_framework.request import Request
+from django.core.exceptions import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import FileUploadParser
@@ -10,7 +10,7 @@ from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
 from api.serializers import UserSerializer, GroupSerializer, ResultSerializer, ImageSerializer, NewUserSerializer
-from .models import Result
+from .models import Result, Image
 from .permissions import IsOwnerOrReadOnly
 
 
@@ -34,6 +34,27 @@ class LoadImageView(APIView):
             return Response(image_serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(image_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# TODO: replace stub method with image process logic
+class ProcessImageView(APIView):
+    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
+
+    def post(self, request):
+        if 'image_id' in request.data:
+            image_id = request.data['image_id']
+            image = Image.objects.get(pk=image_id)
+            new_result = Result(text='Some text on the image', user=request.user, image=image)
+
+            try:
+                new_result.full_clean()
+                result_serializer = ResultSerializer(new_result)
+                new_result.save()
+                return Response(result_serializer.data, status=status.HTTP_201_CREATED)
+            except ValidationError as e:
+                return Response(e.message, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+        return Response('No image_id param', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
 
 class ResultList(generics.ListAPIView):

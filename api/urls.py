@@ -12,4 +12,5 @@ urlpatterns = [
     path('users/<int:pk>/', views.UserDetail.as_view()),
     path('load-image', views.LoadImageView.as_view(), name='load-image'),
     path('register', views.UserCreate.as_view(), name='register'),
+    path('process-image', views.ProcessImageView.as_view(), name='process-image')
 ]
