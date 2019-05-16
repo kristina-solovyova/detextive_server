@@ -1,0 +1,1 @@
+web: gunicorn detextive_server.wsgi --log-file -
