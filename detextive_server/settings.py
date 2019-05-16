@@ -131,7 +131,8 @@ STATIC_URL = '/static/'
 
 CORS_ORIGIN_WHITELIST = (
     'localhost:8080',
-    '127.0.0.1:8080'
+    '127.0.0.1:8080',
+    'https://detextive.herokuapp.com'
 )
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
