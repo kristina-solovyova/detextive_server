@@ -44,3 +44,21 @@ class Result(models.Model):
 
     def saved_recently(self):
         return self.datetime >= timezone.now() - datetime.timedelta(days=1)
+
+
+class ContactUs(models.Model):
+    # Fields
+    name = models.CharField(max_length=255, default='', blank=True)
+    email = models.EmailField()
+    subject = models.CharField(max_length=255)
+    message = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+
+    # Metadata
+    class Meta:
+        ordering = ["-created"]
+        db_table = "contact_us"
+
+    # Methods
+    def __str__(self):
+        return str(self.email) + ': ' + self.subject

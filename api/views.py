@@ -9,7 +9,7 @@ from rest_framework import viewsets
 from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.reverse import reverse
-from api.serializers import UserSerializer, GroupSerializer, ResultSerializer, ImageSerializer, NewUserSerializer
+from api.serializers import *
 from .models import Result, Image
 from .permissions import IsOwnerOrReadOnly
 
@@ -90,6 +90,11 @@ class UserCreate(generics.CreateAPIView):
 class UserList(generics.ListAPIView):
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
+
+
+class SendContactUs(generics.CreateAPIView):
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = ContactUsSerializer
 
 
 class UserDetail(generics.RetrieveAPIView):
