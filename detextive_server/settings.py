@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',  # CORS
     'rest_framework',
+    'scout_apm.django',
     'api',
 ]
 
@@ -159,6 +160,11 @@ JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),
     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
 }
+
+# Scout settings
+SCOUT_MONITOR = True
+SCOUT_KEY = "MHw3KQ1z0bq39RkJNdiT"
+SCOUT_NAME = "Detextive server"
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
