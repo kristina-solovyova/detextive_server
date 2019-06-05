@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'corsheaders',  # CORS
     'rest_framework',
     'api',
+    'cloudinary',
 ]
 
 MIDDLEWARE = [
@@ -160,5 +161,13 @@ JWT_AUTH = {
     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
 }
 
+CELERY_BROKER_URL = 'amqp://qsfblrzd:24gEOeZhQCgEVFGF0XFHHHmF7N_UMpWx@macaw.rmq.cloudamqp.com/qsfblrzd'
+
 # Activate Django-Heroku.
 django_heroku.settings(locals())
+
+CLOUDINARY = {
+  'cloud_name': 'detextive',
+  'api_key': '686892499366765',
+  'api_secret': 'EBwVbNCw7yXUKYHgVp6FmSBQYc0',
+}

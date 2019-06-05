@@ -1,8 +1,12 @@
 import datetime
 import time
+import cloudinary.uploader
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
+from cloudinary.models import CloudinaryField
 
 
 def get_file_path(instance, filename):
@@ -14,7 +18,7 @@ def get_file_path(instance, filename):
 
 class Image(models.Model):
     # Fields
-    img = models.ImageField(upload_to=get_file_path, max_length=200)
+    img = CloudinaryField('image')
     user = models.ForeignKey(User, related_name='images', on_delete=models.CASCADE)
 
     # Metadata
@@ -24,6 +28,11 @@ class Image(models.Model):
     # Methods
     def __str__(self):
         return str(self.id) + ': ' + self.img.path
+
+
+@receiver(pre_delete, sender=Image)
+def image_delete(sender, instance, **kwargs):
+    cloudinary.uploader.destroy(instance.image.public_id)
 
 
 class Result(models.Model):
@@ -44,6 +53,24 @@ class Result(models.Model):
 
     def saved_recently(self):
         return self.datetime >= timezone.now() - datetime.timedelta(days=1)
+
+
+class TextPosition(models.Model):
+    # Fields
+    x = models.IntegerField()
+    y = models.IntegerField()
+    width = models.IntegerField()
+    height = models.IntegerField()
+    angle = models.IntegerField()
+    result = models.ForeignKey(Result, related_name='text_positions', on_delete=models.CASCADE)
+
+    # Metadata
+    class Meta:
+        db_table = "text_position"
+
+    # Methods
+    def __str__(self):
+        return "x: %d, y: %d, w: %d, h: %d, angle: %d" % (self.x, self.y, self.width, self.height, self.angle)
 
 
 class ContactUs(models.Model):
