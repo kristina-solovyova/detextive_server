@@ -69,7 +69,7 @@ class ResultList(generics.ListAPIView):
 
 
 class ResultDetail(generics.RetrieveDestroyAPIView):
-    permission_classes = (permissions.IsAuthenticated, )
+    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
     serializer_class = ResultSerializer
 
     def get_queryset(self):
