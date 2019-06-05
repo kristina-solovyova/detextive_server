@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',  # CORS
     'rest_framework',
+    'scout_apm.django',
     'api',
     'cloudinary',
 ]
@@ -162,6 +163,11 @@ JWT_AUTH = {
 }
 
 CELERY_BROKER_URL = 'amqp://qsfblrzd:24gEOeZhQCgEVFGF0XFHHHmF7N_UMpWx@macaw.rmq.cloudamqp.com/qsfblrzd'
+
+# Scout settings
+SCOUT_MONITOR = True
+SCOUT_KEY = "MHw3KQ1z0bq39RkJNdiT"
+SCOUT_NAME = "Detextive server"
 
 # Activate Django-Heroku.
 django_heroku.settings(locals())
