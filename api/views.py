@@ -12,6 +12,7 @@ from rest_framework.reverse import reverse
 from api.serializers import *
 from .models import Result, Image
 from .permissions import IsOwnerOrReadOnly
+from .tasks import process
 
 
 @api_view(['GET'])
@@ -44,15 +45,16 @@ class ProcessImageView(APIView):
         if 'image_id' in request.data:
             image_id = request.data['image_id']
             image = Image.objects.get(pk=image_id)
-            new_result = Result(text='Some text on the image', user=request.user, image=image)
+            new_result = Result(user=request.user, image=image)
+
+            process.delay(image.img.url, image_id)
 
             try:
                 new_result.full_clean()
-                result_serializer = ResultSerializer(new_result)
                 new_result.save()
-                return Response(result_serializer.data, status=status.HTTP_201_CREATED)
+                return Response('Processing', status=status.HTTP_201_CREATED)
             except ValidationError as e:
-                return Response(e.message, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+                return Response(e.message_dict, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         return Response('No image_id param', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 

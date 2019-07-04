@@ -27,7 +27,7 @@ class Image(models.Model):
 
     # Methods
     def __str__(self):
-        return str(self.id) + ': ' + self.img.path
+        return str(self.id) + ': ' + self.img.url
 
 
 @receiver(pre_delete, sender=Image)
@@ -37,7 +37,7 @@ def image_delete(sender, instance, **kwargs):
 
 class Result(models.Model):
     # Fields
-    datetime = models.DateTimeField(auto_now_add=True)
+    datetime = models.DateTimeField(auto_now=True)
     text = models.TextField(null=True, blank=True)
     image = models.OneToOneField(Image, related_name='result', on_delete=models.SET_NULL, null=True)
     user = models.ForeignKey(User, related_name='results', on_delete=models.CASCADE)
@@ -61,7 +61,7 @@ class TextPosition(models.Model):
     y = models.IntegerField()
     width = models.IntegerField()
     height = models.IntegerField()
-    angle = models.IntegerField()
+    angle = models.DecimalField(max_digits=5, decimal_places=2)
     result = models.ForeignKey(Result, related_name='text_positions', on_delete=models.CASCADE)
 
     # Metadata
