@@ -139,14 +139,17 @@ function num = diplom(img_url, image_id)
         alpha = total_res.Angle{i} * 180/pi;
         if alpha > 90, alpha = alpha - 180; end
 
-%         Im_rot = imrotate(total_res.Img{i}, -alpha);
+        Im_rot = imrotate(total_res.Img{i}, -alpha);
         Im_init_rot = imrotate(image, -alpha);
 
         cc = bwconncomp(total_res.Img{i}); 
         stats = regionprops(cc,'ConvexHull','Centroid'); 
+        
+        cc1 = bwconncomp(Im_rot); 
+        stats1 = regionprops(cc1,'BoundingBox');
 
 %         figure(100+i); imshow(image); 
-        title(['Angle is about ', num2str(alpha), ' degrees']);
+%         title(['Angle is about ', num2str(alpha), ' degrees']);
         for j=1:length(stats)
 %             hold on; figure(100+i);
         
@@ -168,7 +171,8 @@ function num = diplom(img_url, image_id)
             
 %             hold on; plot(polyb,'LineStyle','-','EdgeColor','g','LineWidth',1,'FaceAlpha',0);
             
-            croppedImage = imcrop(Im_init_rot, bb);
+            bbox = stats1(j).BoundingBox;
+            croppedImage = imcrop(Im_init_rot, bbox);
 
             % Perform OCR.
             ocr_text = ocr(croppedImage);

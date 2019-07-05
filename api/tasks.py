@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.utils.crypto import get_random_string
 from pandas.api.types import is_string_dtype
 
-from celery import shared_task
+from celery import shared_task, current_task
 from .matlab_caller import process_image
 from .models import TextPosition, Result
 
@@ -24,6 +24,8 @@ def create_random_user_accounts(total):
 
 @shared_task
 def process(image_url, image_id):
+    current_task.update_state(state='PROGRESS')
+
     process_image(image_url, str(image_id))
     file_name = '%s.csv' % str(image_id)
 
