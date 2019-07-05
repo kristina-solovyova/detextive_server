@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
-from cloudinary.models import CloudinaryField
+from cloudinary.models import CloudinaryField as BaseCloudinaryField
 
 
 def get_file_path(instance, filename):
@@ -14,6 +14,15 @@ def get_file_path(instance, filename):
     user_id = instance.user.id
     milli_sec = int(round(time.time() * 1000))
     return "images/user_%s/%s.%s" % (user_id, milli_sec, ext)
+
+
+class CloudinaryField(BaseCloudinaryField):
+    def upload_options(self, model_instance):
+        return {
+            'width': 800,
+            'height': 512,
+            'crop': "limit"
+        }
 
 
 class Image(models.Model):

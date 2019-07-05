@@ -9,11 +9,11 @@ function num = diplom(img_url, image_id)
 
     % Get an image
     image = imread(img_url);
-    if size(image,1) > IM_MAX_HEIGHT || size(image,2) > IM_MAX_HEIGHT
-        image = imresize(image, [IM_HEIGHT NaN]); % Привести изображение в высоте IM_HEIGHT
-    end
+%     if size(image,1) > IM_MAX_HEIGHT || size(image,2) > IM_MAX_HEIGHT
+%         image = imresize(image, [IM_HEIGHT NaN]); % Привести изображение в высоте IM_HEIGHT
+%     end
     Im = image;
-    figure(2); imshow(Im);
+%     figure(2); imshow(Im);
     Im = rgb2gray(Im); % Перевести изображение в ч/б
 
     % Obtain the 2D CWT with the Gaus and Cauchy wavelets with fixed scale. 
@@ -71,14 +71,14 @@ function num = diplom(img_url, image_id)
         resulted_scale(sc) = sc;
         max_vals(sc) = max_sum_value;
 
-        cc = bwconncomp(processed(:,:,:,sc,max_angle_ind)); 
-        stats = regionprops(cc, 'ConvexHull'); 
-
-        for i=1:length(stats)
-            hull = stats(i).ConvexHull;
-            hold on;
-            plot(hull(:,1), hull(:,2), 'r-');
-        end
+%         cc = bwconncomp(processed(:,:,:,sc,max_angle_ind)); 
+%         stats = regionprops(cc, 'ConvexHull'); 
+% 
+%         for i=1:length(stats)
+%             hull = stats(i).ConvexHull;
+%             hold on;
+%             plot(hull(:,1), hull(:,2), 'r-');
+%         end
     end
 
     resulted = table(resulted_ang, resulted_scale, resulted_img',...
@@ -145,10 +145,10 @@ function num = diplom(img_url, image_id)
         cc = bwconncomp(total_res.Img{i}); 
         stats = regionprops(cc,'ConvexHull','Centroid'); 
 
-        figure(100+i); imshow(image); 
+%         figure(100+i); imshow(image); 
         title(['Angle is about ', num2str(alpha), ' degrees']);
         for j=1:length(stats)
-            hold on; figure(100+i);
+%             hold on; figure(100+i);
         
             % Развернуть convexhull параллельно оси х (по точке центра)
             hull = stats(j).ConvexHull;
@@ -166,7 +166,7 @@ function num = diplom(img_url, image_id)
             polyb = rotate(polyinb, -alpha, stats(j).Centroid);
             vert = round(polyb.Vertices, 0);
             
-            hold on; plot(polyb,'LineStyle','-','EdgeColor','g','LineWidth',1,'FaceAlpha',0);
+%             hold on; plot(polyb,'LineStyle','-','EdgeColor','g','LineWidth',1,'FaceAlpha',0);
             
             croppedImage = imcrop(Im_init_rot, bb);
 
@@ -174,12 +174,12 @@ function num = diplom(img_url, image_id)
             ocr_text = ocr(croppedImage);
             disp(ocr_text.Text);
             
-            words{end+1} = ocr_text.Text;
+            words{end+1} = replace(ocr_text.Text, newline, ' ');
             angs{end+1} = alpha;
-            bbox1{end+1} = vert(1,1); % X-coord
-            bbox2{end+1} = vert(1,2); % Y-coord
-            bbox3{end+1} = vert(3,1)-vert(1,1); % width
-            bbox4{end+1} = vert(2,2)-vert(1,2); % height
+            bbox1{end+1} = bb(1); % X-coord
+            bbox2{end+1} = bb(2); % Y-coord
+            bbox3{end+1} = bb(3); % width
+            bbox4{end+1} = bb(4); % height
         end
     end
     
