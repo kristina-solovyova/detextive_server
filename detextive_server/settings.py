@@ -163,6 +163,10 @@ JWT_AUTH = {
 }
 
 CELERY_BROKER_URL = 'amqp://qsfblrzd:24gEOeZhQCgEVFGF0XFHHHmF7N_UMpWx@macaw.rmq.cloudamqp.com/qsfblrzd'
+CELERY_RESULT_BACKEND = 'amqp://qsfblrzd:24gEOeZhQCgEVFGF0XFHHHmF7N_UMpWx@macaw.rmq.cloudamqp.com/qsfblrzd'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 # Scout settings
 SCOUT_MONITOR = True

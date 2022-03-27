@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from .models import Result, Image, ContactUs
+from .models import Result, Image, ContactUs, TextPosition
 
 
 class ImageSerializer(serializers.ModelSerializer):
@@ -19,6 +19,24 @@ class ResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = Result
         fields = ('id', 'image_url', 'datetime', 'text', 'user')
+
+
+class TextPositionSerializer(serializers.ModelSerializer):
+    result_id = serializers.ReadOnlyField(source='result.id')
+
+    class Meta:
+        model = TextPosition
+        fields = "__all__"
+
+
+class ResultDetailSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source='user.username')
+    image_url = serializers.ReadOnlyField(source='image.img.url')
+    text_positions = TextPositionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Result
+        fields = ('id', 'image_url', 'datetime', 'text', 'user', 'text_positions')
 
 
 class NewUserSerializer(serializers.ModelSerializer):

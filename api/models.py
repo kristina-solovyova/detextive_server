@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
-from cloudinary.models import CloudinaryField
+from cloudinary.models import CloudinaryField as BaseCloudinaryField
 
 
 def get_file_path(instance, filename):
@@ -14,6 +14,15 @@ def get_file_path(instance, filename):
     user_id = instance.user.id
     milli_sec = int(round(time.time() * 1000))
     return "images/user_%s/%s.%s" % (user_id, milli_sec, ext)
+
+
+class CloudinaryField(BaseCloudinaryField):
+    def upload_options(self, model_instance):
+        return {
+            'width': 800,
+            'height': 512,
+            'crop': "limit"
+        }
 
 
 class Image(models.Model):
@@ -27,7 +36,7 @@ class Image(models.Model):
 
     # Methods
     def __str__(self):
-        return str(self.id) + ': ' + self.img.path
+        return str(self.id) + ': ' + self.img.url
 
 
 @receiver(pre_delete, sender=Image)
@@ -37,7 +46,7 @@ def image_delete(sender, instance, **kwargs):
 
 class Result(models.Model):
     # Fields
-    datetime = models.DateTimeField(auto_now_add=True)
+    datetime = models.DateTimeField(auto_now=True)
     text = models.TextField(null=True, blank=True)
     image = models.OneToOneField(Image, related_name='result', on_delete=models.SET_NULL, null=True)
     user = models.ForeignKey(User, related_name='results', on_delete=models.CASCADE)
@@ -61,7 +70,7 @@ class TextPosition(models.Model):
     y = models.IntegerField()
     width = models.IntegerField()
     height = models.IntegerField()
-    angle = models.IntegerField()
+    angle = models.DecimalField(max_digits=5, decimal_places=2)
     result = models.ForeignKey(Result, related_name='text_positions', on_delete=models.CASCADE)
 
     # Metadata

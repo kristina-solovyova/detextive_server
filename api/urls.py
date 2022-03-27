@@ -13,5 +13,6 @@ urlpatterns = [
     path('load-image', views.LoadImageView.as_view(), name='load-image'),
     path('register', views.UserCreate.as_view(), name='register'),
     path('process-image', views.ProcessImageView.as_view(), name='process-image'),
-    path('contact-us', views.SendContactUs.as_view(), name='contact-us')
+    path('contact-us', views.SendContactUs.as_view(), name='contact-us'),
+    path('get-progress', views.get_task_info, name='get-progress'),
 ]

@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User, Group
+from celery.result import AsyncResult
 from django.core.exceptions import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -12,6 +12,7 @@ from rest_framework.reverse import reverse
 from api.serializers import *
 from .models import Result, Image
 from .permissions import IsOwnerOrReadOnly
+from .tasks import process
 
 
 @api_view(['GET'])
@@ -44,17 +45,29 @@ class ProcessImageView(APIView):
         if 'image_id' in request.data:
             image_id = request.data['image_id']
             image = Image.objects.get(pk=image_id)
-            new_result = Result(text='Some text on the image', user=request.user, image=image)
+            new_result = Result(user=request.user, image=image)
+
+            task = process.delay(image.img.url, image_id)
 
             try:
                 new_result.full_clean()
-                result_serializer = ResultSerializer(new_result)
                 new_result.save()
-                return Response(result_serializer.data, status=status.HTTP_201_CREATED)
+                return Response({'state': 'Processing', 'task_id': task.id, 'result_id': new_result.id},
+                                status=status.HTTP_201_CREATED)
             except ValidationError as e:
-                return Response(e.message, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+                return Response(e.message_dict, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         return Response('No image_id param', status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+
+@api_view(['GET'])
+def get_task_info(request):
+    task_id = request.GET['task_id']
+    if task_id is not None:
+        task = AsyncResult(task_id)
+        return Response({'state': task.state}, content_type='application/json')
+    else:
+        return Response('No job id given.')
 
 
 class ResultList(generics.ListAPIView):
@@ -70,7 +83,7 @@ class ResultList(generics.ListAPIView):
 
 class ResultDetail(generics.RetrieveDestroyAPIView):
     permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
-    serializer_class = ResultSerializer
+    serializer_class = ResultDetailSerializer
 
     def get_queryset(self):
         return Result.objects.filter(user=self.request.user)
